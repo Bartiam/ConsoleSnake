@@ -1,20 +1,21 @@
 #include <iostream>
 #include <ctime>
+#include <conio.h>
 
 using namespace std;
 
 const int height = 26;
 const int width = 100;
 int score;
+int continues = 3;
 bool gameOver;
-
-enum Dir {
-	STOP = 0, LEFT, RIGHT, UP, DOWN
-};
+enum Dir {STOP = 0, LEFT, RIGHT, UP, DOWN};
+Dir dir;
 
 void Setup() {
 	score = 0;
 	gameOver = false;
+	dir = STOP;
 }
 
 class Snake {
@@ -59,7 +60,7 @@ public:
 		this->fruitX = fruitX;
 	}
 
-	void setFruitY() {
+	void setFruitY(int fruitY) {
 		this->fruitY = fruitY;
 	}
 
@@ -72,7 +73,7 @@ public:
 	}
 };
 
-void Draw(Snake &snake, Fruit &fruit) {
+void Draw(Snake& snake, Fruit& fruit) {
 	
 	for (int i = 0; i < width; i++)
 	{
@@ -107,20 +108,93 @@ void Draw(Snake &snake, Fruit &fruit) {
 		cout << "#";
 	}
 	
-	cout << endl << score << endl;
+	cout << endl << "Your score: " << score << endl;
 
 	system("cls");
 }
 
+void Input(Snake& snake) {
+	switch (dir)
+	{
+	case LEFT:
+		snake.setSnakeY(snake.getSnakeY() - 1);
+		break;
+	case RIGHT:
+		snake.setSnakeY(snake.getSnakeY() + 1);
+		break;
+	case UP:
+		snake.setSnakeX(snake.getSnakeX() - 1);
+		break;
+	case DOWN:
+		snake.setSnakeX(snake.getSnakeX() + 1);
+		break;
+	}
+}
 
+void Logic(Snake& snake, Fruit& fruit) {
+	if (_kbhit()) {
+		switch (_getch())
+		{
+		case 'a':
+			dir = LEFT;
+			break;
+		case 'd':
+			dir = RIGHT;
+			break;
+		case 'w':
+			dir = UP;
+			break;
+		case 's':
+			dir = DOWN;
+			break;
+		case 'x':
+			gameOver = true;
+			break;
+		}
+	}
+
+	if (snake.getSnakeX() == height || snake.getSnakeY() == width -1
+		|| snake.getSnakeX() == -1 || snake.getSnakeY() == 0)
+	{
+		int way;
+		cout << "\n\n\n\n\n\n\n\n\n\n\t\tВы проиграли. Хотите использовать жизнь и продолжить ? Введите ответ." << endl;
+		cout << "\t\t\t\t\t\t1.Да " << endl << "\t\t\t\t\t\t2.Нет " << endl;
+		cin >> way;
+		if (way == 1) 
+		{
+			continues--;
+			snake.setSnakeX(height / 2 - 1);
+			snake.setSnakeY(width / 2 - 1);
+		}
+		else
+		{
+			gameOver = true;
+		}
+
+		if (continues == 0)
+		{
+			gameOver = true;
+		}
+	}
+	if (snake.getSnakeX() == fruit.getFruitX()
+		&& snake.getSnakeY() == fruit.getFruitY())
+	{
+		score++;
+		fruit.setFruitX(rand() % height - 1);
+		fruit.setFruitY(rand() % width - 1);
+	}
+}
 
 int main() {
 	srand(time(NULL));
 	Snake snake;
 	Fruit fruit;
-	while (true)
+	Setup();
+	while (!gameOver)
 	{
 		Draw(snake, fruit);
+		Logic(snake, fruit);
+		Input(snake);
 	}
 
 
