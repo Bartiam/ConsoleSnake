@@ -156,24 +156,56 @@ void Logic(Snake& snake, Fruit& fruit) {
 	if (snake.getSnakeX() == height || snake.getSnakeY() == width -1
 		|| snake.getSnakeX() == -1 || snake.getSnakeY() == 0)
 	{
-		int way;
-		cout << "\n\n\n\n\n\n\n\n\n\n\t\tВы проиграли. Хотите использовать жизнь и продолжить ? Введите ответ." << endl;
-		cout << "\t\t\t\t\t\t1.Да " << endl << "\t\t\t\t\t\t2.Нет " << endl;
-		cin >> way;
-		if (way == 1) 
+		while (true)
 		{
-			continues--;
-			snake.setSnakeX(height / 2 - 1);
-			snake.setSnakeY(width / 2 - 1);
-		}
-		else
-		{
-			gameOver = true;
+			int way;
+			cout << "\n\n\n\n\n\n\n\n\n\n\t\tВы проиграли. Хотите использовать жизнь и продолжить ? Введите ответ." << endl;
+			cout << "\t\t\t\t\t\t1.Да " << endl << "\t\t\t\t\t\t2.Нет " << endl << "\t\t\t\t\t\t";
+			cin >> way;
+			system("cls");
+			if (way == 1)
+			{
+				continues--;
+				snake.setSnakeX(height / 2 - 1);
+				snake.setSnakeY(width / 2 - 1);
+				break;
+			}
+			else if (way == 2)
+			{
+				gameOver = true;
+				break;
+			}
+			else
+			{
+				cout << "\n\n\n\n\n\n\n\n\n\n\t\tХотите использовать жизнь и продолжить ? Введите 1 или 2." << endl;
+				cout << "\t\t\t\t\t\t1.Да " << endl << "\t\t\t\t\t\t2.Нет " << endl << "\t\t\t\t\t\t";
+				cin >> way;
+				system("cls");
+				if (way == 1)
+				{
+					continues--;
+					snake.setSnakeX(height / 2 - 1);
+					snake.setSnakeY(width / 2 - 1);
+					break;
+				}
+				break;
+			}
 		}
 
 		if (continues == 0)
 		{
-			gameOver = true;
+			int way;
+			cout << "\n\n\n\n\n\n\n\n\n\n\t\tУ вас закончились жизни, хотите начать сначала ? " << endl;
+			cout << "\t\t\t\t\t\t1.Да " << endl << "\t\t\t\t\t\t2.Нет " << endl << "\t\t\t\t\t\t";
+			cin >> way;
+			if (way == 2)
+			{
+				gameOver = true;
+			}
+			else
+			{
+				continues = 3;
+			}
 		}
 	}
 	if (snake.getSnakeX() == fruit.getFruitX()
