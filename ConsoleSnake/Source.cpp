@@ -1,7 +1,6 @@
 #include <iostream>
 #include <ctime>
 #include <conio.h>
-#include <vector>
 
 using namespace std;
 
@@ -14,11 +13,13 @@ enum Dir {STOP = 0, LEFT, RIGHT, UP, DOWN};
 Dir dir;
 int indexTailX[(height - 1) * (width - 1)];
 int indexTailY[(height - 1) * (width - 1)];
+int countTail;
 
 void Setup() {
 	score = 0;
 	gameOver = false;
 	dir = STOP;
+	countTail = 0;
 }
 
 class Snake {
@@ -129,6 +130,53 @@ void Draw(Snake& snake, Fruit& fruit) {
 }
 
 void Input(Snake& snake) {
+	if (_kbhit()) {
+		switch (_getch())
+		{
+		case 'a':
+			if (dir != RIGHT) {
+				dir = LEFT;
+			}
+			break;
+		case 'd':
+			if (dir != LEFT) {
+				dir = RIGHT;
+			}
+			break;
+		case 'w':
+			if (dir != DOWN)
+			{
+				dir = UP;
+			}
+			break;
+		case 's':
+			if (dir != UP)
+			{
+				dir = DOWN;
+			}
+			break;
+		case 'x':
+			gameOver = true;
+			break;
+		}
+	}
+}
+
+void Logic(Snake& snake, Fruit& fruit) {
+	int prevTailX = indexTailX[0];
+	int prevTailY = indexTailY[0];
+	int prevTailX2, prevTailY2;
+	indexTailX[0] = snake.getSnakeX();
+	indexTailY[0] = snake.getSnakeY();
+	for (int i = 1; i < countTail; i++)
+	{
+		prevTailX2 = indexTailX[i];
+		prevTailY2 = indexTailY[i];
+		indexTailX[i] = prevTailX;
+		indexTailY[i] = prevTailY;
+		prevTailX = prevTailX2;
+		prevTailY = prevTailY2;
+	}
 	switch (dir)
 	{
 	case LEFT:
@@ -143,43 +191,6 @@ void Input(Snake& snake) {
 	case DOWN:
 		snake.setSnakeX(snake.getSnakeX() + 1);
 		break;
-	}
-}
-
-void Logic(Snake& snake, Fruit& fruit) {
-	int prevTailX = indexTailX[0];
-	int prevTailY = indexTailY[0];
-	int prevTailX2, prevTailY2;
-	indexTailX[0] = snake.getSnakeX();
-	indexTailY[0] = snake.getSnakeY();
-	for (int i = 1; i < score; i++)
-	{
-		prevTailX2 = indexTailX[i];
-		prevTailY2 = indexTailY[i];
-		indexTailX[i] = prevTailX;
-		indexTailY[i] = prevTailY;
-		prevTailX = prevTailX2;
-		prevTailY = prevTailY2;
-	}
-	if (_kbhit()) {
-		switch (_getch())
-		{
-		case 'a':
-			dir = LEFT;
-			break;
-		case 'd':
-			dir = RIGHT;
-			break;
-		case 'w':
-			dir = UP;
-			break;
-		case 's':
-			dir = DOWN;
-			break;
-		case 'x':
-			gameOver = true;
-			break;
-		}
 	}
 
 	if (snake.getSnakeX() == height || snake.getSnakeY() == width -1
@@ -264,15 +275,39 @@ void Logic(Snake& snake, Fruit& fruit) {
 		}
 	}
 
-	for (int i = 0; i < score; i++)
+	for (int i = 0; i < countTail; i++)
 	{
-		cout << indexTailX[i];
+		if (indexTailX[i] == snake.getSnakeX() && indexTailY[i] == snake.getSnakeY())
+		{
+			int way;
+			cout << "\n\n\n\n\n\n\n\n\n\n\t\tВы проиграли. Хотите использовать жизнь и продолжить ? Введите ответ." << endl;
+			cout << "\t\t\t\t\t\t1.Да " << endl << "\t\t\t\t\t\t2.Нет " << endl << "\t\t\t\t\t\t";
+			cin >> way;
+			system("cls");
+
+			if (way == 1)
+			{
+				continues--;
+				snake.setSnakeX(height / 2 - 1);
+				snake.setSnakeY(width / 2 - 1);
+				fruit.setFruitX(rand() % (height - 1) + 1);
+				fruit.setFruitY(rand() % (width - 1) + 1);
+				dir = STOP;
+				break;
+			}
+			else if (way == 2)
+			{
+				gameOver = true;
+				break;
+			}
+		}
 	}
 
 	if (snake.getSnakeX() == fruit.getFruitX()
 		&& snake.getSnakeY() == fruit.getFruitY())
 	{
-		score++;
+		score += 10;
+		countTail++;
 		fruit.setFruitX(rand() % (height - 1) + 1);
 		fruit.setFruitY(rand() % (width - 1) + 1);
 	}
@@ -286,8 +321,8 @@ int main() {
 	while (!gameOver)
 	{
 		Draw(snake, fruit);
-		Logic(snake, fruit);
 		Input(snake);
+		Logic(snake, fruit);
 	}
 
 
